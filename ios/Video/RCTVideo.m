@@ -1702,6 +1702,13 @@ didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest {
   }
   _loadingRequest = loadingRequest;
   NSURL *url = loadingRequest.request.URL;
+ 
+    if(self.onLoadingRequest) {
+        self.onLoadingRequest(@{
+            @"url": [url absoluteString],
+            @"target": self.reactTag});
+    }
+
   NSString *contentId = url.host;
   if (self->_drm != nil) {
     NSString *contentIdOverride = (NSString *)[self->_drm objectForKey:@"contentId"];
@@ -1733,12 +1740,11 @@ didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest {
               }
               if (spcData != nil) {
                 if(self.onGetLicense) {
-                  NSString *spcStr = [[NSString alloc] initWithData:spcData encoding:NSASCIIStringEncoding];
                   self->_requestingCertificate = YES;
-                  self.onGetLicense(@{@"spc": spcStr,
-                                      @"contentId": contentId,
-                                      @"spcBase64": [[[NSData alloc] initWithBase64EncodedData:certificateData options:NSDataBase64DecodingIgnoreUnknownCharacters] base64EncodedStringWithOptions:0],
-                                      @"target": self.reactTag});
+                    self.onGetLicense(@{
+                        @"spc": [spcData base64EncodedStringWithOptions:0],
+                        @"contentId": contentId,
+                        @"target": self.reactTag});
                 } else if(licenseServer != nil) {
                   NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
                   [request setHTTPMethod:@"POST"];

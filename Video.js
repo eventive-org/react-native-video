@@ -213,7 +213,7 @@ export default class Video extends Component {
   };
 
   _onRestoreUserInterfaceForPictureInPictureStop = (event) => {
-  	if (this.props.onRestoreUserInterfaceForPictureInPictureStop) {
+    if (this.props.onRestoreUserInterfaceForPictureInPictureStop) {
       this.props.onRestoreUserInterfaceForPictureInPictureStop();
     }
   };
@@ -250,6 +250,14 @@ export default class Video extends Component {
       }
     }
   }
+
+  _onLoadingRequest = (event) => {
+    if (this.props.drm && this.props.drm.loadingRequest instanceof Function) {
+      const data = event.nativeEvent;
+      this.props.drm.loadingRequest({ url: data.url });
+    }
+  }
+
   getViewManagerConfig = viewManagerName => {
     if (!NativeModules.UIManager.getViewManagerConfig) {
       return NativeModules.UIManager[viewManagerName];
@@ -322,6 +330,7 @@ export default class Video extends Component {
       onPlaybackRateChange: this._onPlaybackRateChange,
       onAudioFocusChanged: this._onAudioFocusChanged,
       onAudioBecomingNoisy: this._onAudioBecomingNoisy,
+      onLoadingRequest: nativeProps.drm && nativeProps.drm.loadingRequest && this._onLoadingRequest,
       onGetLicense: nativeProps.drm && nativeProps.drm.getLicense && this._onGetLicense,
       onPictureInPictureStatusChanged: this._onPictureInPictureStatusChanged,
       onRestoreUserInterfaceForPictureInPictureStop: this._onRestoreUserInterfaceForPictureInPictureStop,
